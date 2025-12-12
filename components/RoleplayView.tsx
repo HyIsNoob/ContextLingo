@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '../types';
 import { ChatIcon, SwitchHorizontalIcon, XIcon, WandIcon, RefreshIcon, LightBulbIcon, SaveIcon, CheckIcon } from './Icons';
+import Mascot from './Mascot';
 import ConfirmModal from './ConfirmModal';
 import { playSfx } from '../utils/audio';
 
@@ -24,14 +25,22 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
   const [activeFeedback, setActiveFeedback] = useState<Record<string, 'correction' | 'suggestion' | null>>({});
   const [isSaved, setIsSaved] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Improved Scroll Logic: Directly manipulate scrollTop for reliable scrolling
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (containerRef.current) {
+        const { scrollHeight, clientHeight } = containerRef.current;
+        containerRef.current.scrollTop = scrollHeight - clientHeight;
+    }
   };
 
   useEffect(() => {
+    // Scroll immediately
     scrollToBottom();
+    // And again after a slight delay to account for layout shifts (like images/fonts loading or animations)
+    const timeout = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timeout);
   }, [history, isSending, activeFeedback]);
 
   // Check for perfect grammar on new messages to play sound
@@ -39,7 +48,6 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
       const lastMsg = history[history.length - 1];
       if (lastMsg && lastMsg.role === 'user' && !lastMsg.isGrammarPending && lastMsg.grammarAnalysis && !lastMsg.grammarAnalysis.hasError) {
           // Check if we just received this analysis (basic check to avoid replay on render)
-          // Ideally track this in state, but simple sfx here is fine
       }
   }, [history]);
 
@@ -83,7 +91,7 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
   };
 
   return (
-    <div className="w-full h-screen flex flex-col bg-[#f8fafc] overflow-hidden animate-fade-in font-nunito">
+    <div className="w-full h-screen flex flex-col bg-[#f8fafc] overflow-hidden animate-fade-in font-nunito relative">
       
       <ConfirmModal 
         isOpen={showExitConfirm}
@@ -96,7 +104,7 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
       />
 
       {/* Glassmorphism Header - Fixed */}
-      <div className="bg-white/80 backdrop-blur-md px-4 py-3 border-b border-slate-200 flex justify-between items-center z-20 shrink-0 sticky top-0 shadow-sm">
+      <div className="bg-white/80 backdrop-blur-md px-4 py-3 border-b border-slate-200 flex justify-between items-center z-30 shrink-0 sticky top-0 shadow-sm">
         <div className="flex items-center gap-3">
             <button onClick={handleExitClick} className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all shadow-sm border border-slate-100">
                 <XIcon />
@@ -130,7 +138,8 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
       </div>
 
       {/* Messages Area with Pattern Background */}
-      <div className="flex-grow overflow-y-auto p-4 md:p-6 custom-scrollbar relative z-0 pb-32">
+      {/* Added scroll-behavior: smooth via styling if preferred, but manual scrollTop is more performant for chat */}
+      <div ref={containerRef} className="flex-grow overflow-y-auto p-4 md:p-6 custom-scrollbar relative z-0 pb-40">
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: `radial-gradient(#cbd5e1 1px, transparent 1px)`, backgroundSize: '20px 20px' }}></div>
         
         {history.length === 0 && (
@@ -155,9 +164,12 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
             >
                 {/* AI Avatar (Left) */}
                 {!isUser && (
-                    <div className="shrink-0 flex flex-col justify-end">
-                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200 flex items-center justify-center text-lg border-2 border-white shadow-sm">
-                           🤖
+                    <div className="shrink-0 flex flex-col justify-end pb-1">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm relative">
+                           {/* Using Mascot Component Here */}
+                           <div className="absolute inset-0 top-1">
+                              <Mascot emotion="happy" size="sm" className="w-full h-full" />
+                           </div>
                         </div>
                     </div>
                 )}
@@ -277,11 +289,10 @@ const RoleplayView: React.FC<RoleplayViewProps> = ({
            </div>
         )}
         </div>
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Floating Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc] to-transparent z-20">
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc] via-80% to-transparent z-20">
         <form onSubmit={handleSend} className="relative max-w-4xl mx-auto">
           <input
             type="text"

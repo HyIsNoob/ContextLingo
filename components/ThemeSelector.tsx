@@ -67,23 +67,23 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
               onMouseEnter={() => { if(!isHovered) playSfx('hover'); setHoveredIndex(index); }}
               onMouseLeave={() => setHoveredIndex(null)}
               disabled={isLoading}
-              className={`group relative flex flex-col justify-between h-80 p-8 rounded-[2rem] border text-left transition-all duration-300 animate-enter ${
+              className={`group relative flex flex-col justify-between h-80 p-6 rounded-[2rem] border text-left transition-all duration-300 animate-enter ${
                 isCompleted 
                   ? 'bg-slate-50 border-slate-200 opacity-70 hover:opacity-100' 
                   : 'bg-white border-slate-200 shadow-sm hover:border-indigo-300 hover:shadow-2xl hover:-translate-y-2'
               }`}
-              style={{ animationDelay: `${index * 150}ms` }}
+              style={{ animationDelay: `${index * 150}ms`, zIndex: isHovered ? 10 : 1 }}
             >
               {/* Floating LingoBot on Hover */}
               {isHovered && !isCompleted && !isLoading && (
-                  <div className="absolute -top-10 -right-4 z-20 animate-pop-in pointer-events-none">
+                  <div className="absolute -top-12 -right-6 z-20 animate-pop-in pointer-events-none">
                       <Mascot emotion="happy" size="md" />
                   </div>
               )}
 
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-xl shadow-sm transition-transform group-hover:scale-110 ${isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-900 group-hover:bg-indigo-600 group-hover:text-white'}`}>
+              <div className="flex-grow flex flex-col overflow-hidden w-full">
+                <div className="flex justify-between items-start mb-4 shrink-0">
+                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm transition-transform group-hover:scale-110 ${isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-900 group-hover:bg-indigo-600 group-hover:text-white'}`}>
                       {isCompleted ? <CheckIcon /> : `0${index + 1}`}
                    </div>
                    {isCompleted && (
@@ -93,15 +93,19 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
                    )}
                 </div>
                 
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight">
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight line-clamp-2">
                   {theme.title}
                 </h3>
-                <p className="text-slate-500 font-medium leading-relaxed">
-                  {theme.tagline}
-                </p>
+                
+                {/* Scrollable Description Area */}
+                <div className="overflow-y-auto custom-scrollbar pr-1 relative flex-grow">
+                     <p className="text-slate-500 font-medium leading-relaxed">
+                        {theme.tagline}
+                     </p>
+                </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 mt-auto">
+              <div className="pt-4 border-t border-slate-100 mt-2 shrink-0 w-full">
                  <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wide group-hover:text-indigo-500 transition-colors">
                     <SparklesIcon /> 
                     <span>{theme.available_roles.length} Roles Available</span>

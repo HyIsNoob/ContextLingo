@@ -11,6 +11,7 @@ import LoadingScreen from './components/LoadingScreen';
 import HistoryView from './components/HistoryView';
 import MagicRecapCard from './components/MagicRecapCard';
 import WordChainGame from './components/WordChainGame';
+import ConfirmModal from './components/ConfirmModal'; // Added Import
 
 import { 
   generateThemes, 
@@ -22,6 +23,7 @@ import {
 } from './services/geminiService';
 
 import { saveHistoryItem, getHistory, saveChatSession, getSavedChats } from './services/storageService';
+import { playSfx } from './utils/audio'; // Added Import
 
 import { 
   SessionState, 
@@ -79,6 +81,9 @@ const App: React.FC = () => {
   
   // Transient state for history navigation
   const [historyTab, setHistoryTab] = useState<'sessions' | 'saved' | 'chats'>('sessions');
+
+  // NEW: State for Header Navigation Confirmation
+  const [showHeaderNavConfirm, setShowHeaderNavConfirm] = useState(false);
 
   useEffect(() => {
     const initializeSession = () => {
@@ -169,6 +174,24 @@ const App: React.FC = () => {
   };
 
   const handleAddXp = (amount: number) => setSession(prev => ({ ...prev, xp: prev.xp + amount }));
+
+  // --- Header Navigation Logic ---
+  const handleHeaderLogoClick = () => {
+      // Views where we want to warn the user before leaving
+      const protectedViews = ['theme_selection', 'role_selection', 'learn_mode', 'roleplay_mode', 'minigame'];
+      
+      if (protectedViews.includes(session.view)) {
+          playSfx('click');
+          setShowHeaderNavConfirm(true);
+      } else {
+          setSession(prev => ({...prev, view: 'dashboard'}));
+      }
+  };
+
+  const confirmReturnToDashboard = () => {
+      setShowHeaderNavConfirm(false);
+      setSession(prev => ({...prev, view: 'dashboard'}));
+  };
 
   // --- Core Flow ---
 
@@ -475,11 +498,23 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
+      
+      {/* Global Confirmation for Header Navigation */}
+      <ConfirmModal 
+        isOpen={showHeaderNavConfirm}
+        title="Go to Dashboard?"
+        message="Your current session progress will be lost if you leave now."
+        confirmLabel="Go Dashboard"
+        onConfirm={confirmReturnToDashboard}
+        onCancel={() => setShowHeaderNavConfirm(false)}
+        variant="danger"
+      />
+
       {session.view !== 'roleplay_mode' && session.view !== 'minigame' && (
         <Header 
             xp={session.xp} 
             streak={session.streak} 
-            onDashboard={() => setSession(prev => ({...prev, view: 'dashboard'}))}
+            onDashboard={handleHeaderLogoClick} // UPDATED: Use the new handler
             isDashboard={session.view === 'dashboard'}
         />
       )}
