@@ -1,0 +1,7 @@
+{
+  "name": "ContextLingo",
+  "description": "An AI-powered English learning assistant that generates vocabulary and quizzes based on user-provided text or images.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
