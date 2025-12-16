@@ -9,6 +9,32 @@ AI-powered language learning from real-life context. Users upload a photo or des
 - Built for Kaggle hackathon: **Google DeepMind - Vibe Code with Gemini 3 Pro in AI Studio Kaggle Hackathon**
 - Team: 2 members — HyIsNoob and Jaxy
 
+## Demo Trailer (2 minutes)
+<div align="center">
+   <a href="https://www.youtube.com/watch?v=bzqArNZ-5S4" title="ContextLingo — 2-minute Demo Trailer">
+      <img alt="ContextLingo Trailer" src="https://img.youtube.com/vi/bzqArNZ-5S4/maxresdefault.jpg" width="900" />
+   </a>
+   <br/>
+   <a href="https://www.youtube.com/watch?v=bzqArNZ-5S4">
+      ▶ Watch on YouTube
+   </a>
+   ·
+   <a href="#key-features">Explore Features</a>
+   ·
+   <a href="#getting-started">Try Locally</a>
+  
+</div>
+
+## Hackathon Entry
+Level up the learning vibe with our official Kaggle submission and write-up.
+
+[![Kaggle Writeup](https://img.shields.io/badge/Kaggle-ContextLingo%20Writeup-20BEFF)](https://www.kaggle.com/competitions/gemini-3/writeups/contextlingo-gemini-3-pro-vibe-code)
+
+Quick highlights:
+- Real-context themes from your photo or description.
+- Quiz gating, roleplay swaps, and Grammar Detective.
+- Magic Recap Card export for sharing progress.
+
 ## Key Features
 - **Context-first lessons:** Upload image → Gemini 3 Pro analyzes → suggests 3 themes tied to the original context.
 - **Bilingual Bridge:** Target language separated from instruction language; examples are bilingual.
